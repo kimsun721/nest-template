@@ -9,9 +9,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ZodValidationPipe());
   app.enableShutdownHooks();
   app.useGlobalFilters(new CustomExceptionFilter());
+  app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalInterceptors(new TransformInterceptor());
 
   app.enableCors({

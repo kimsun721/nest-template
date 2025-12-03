@@ -7,7 +7,7 @@ export class TransformInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         const res = context.switchToHttp().getResponse();
-        if (res.headersSent) return data; // 이미 redirect나 res.json 썼으면 그냥 원본 반환
+        if (res.headersSent) return data;
         return {
           statusCode: res.statusCode,
           data,
