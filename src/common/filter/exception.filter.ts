@@ -1,15 +1,6 @@
-import {
-  ArgumentsHost,
-  BadRequestException,
-  Catch,
-  ConflictException,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { Response } from 'express';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { ZodSerializationException, ZodValidationException } from 'nestjs-zod';
+import { Prisma } from 'src/generated/prisma/client';
 import z, { prettifyError, ZodError } from 'zod';
 
 @Catch()
