@@ -2,7 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { ZodSerializationException, ZodValidationException } from 'nestjs-zod';
 import { Prisma } from 'src/prisma/generated/prisma/client';
 import z, { prettifyError, ZodError } from 'zod';
-import { BaseResponseSchema } from '../dto/base-response';
+import { BaseResponseSchema, ErrorResponseSchema } from '../dto/base-response';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
@@ -48,8 +48,10 @@ export class CustomExceptionFilter implements ExceptionFilter {
           error = 'NotFound';
           break;
         case 'P2025': // record not found
+          const record = exception.meta?.modelName ?? 'Record';
+
           status = HttpStatus.NOT_FOUND;
-          message = 'Record not found';
+          message = `${record} not found`;
           error = 'RecordNotFound';
           break;
         default:
@@ -69,10 +71,10 @@ export class CustomExceptionFilter implements ExceptionFilter {
     }
 
     response.status(status).json(
-      BaseResponseSchema.parse({
+      ErrorResponseSchema.parse({
         statusCode: status,
         success: false,
-        data: error,
+        error,
         message,
       }),
     );

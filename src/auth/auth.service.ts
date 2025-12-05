@@ -10,9 +10,6 @@ export class AuthService {
   ) {}
 
   async get(id: number) {
-    const user = await this.prismaService.user.findUnique({ where: { id } });
-    if (!user) throw new NotFoundException('user not found');
-
-    return user;
+    return await this.prismaService.user.findUniqueOrThrow({ where: { id } });
   }
 }

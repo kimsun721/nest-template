@@ -8,17 +8,17 @@ export const BaseResponseSchema = z.object({
   message: z.string().default(''),
 });
 
+export const ErrorResponseSchema = z.object({
+  statusCode: z.number().default(HttpStatus.BAD_REQUEST),
+  success: z.boolean().default(false),
+  error: z.json().default(null),
+  message: z.string().default(''),
+});
+
 export class BaseResponse {
   static success<T>(data: T, message: string) {
     return {
       success: true,
-      data,
-      message,
-    };
-  }
-  static fail<T>(data: T, message: string) {
-    return {
-      success: false,
       data,
       message,
     };
