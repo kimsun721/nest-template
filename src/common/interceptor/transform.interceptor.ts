@@ -1,17 +1,27 @@
-import { Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  HttpStatus,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { map } from 'rxjs';
+import { BaseResponseSchema } from '../response';
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
-  intercept(context, next) {
+  intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
-      map((data) => {
+      map((responseData) => {
         const res = context.switchToHttp().getResponse();
-        if (res.headersSent) return data;
-        return {
-          statusCode: res.statusCode,
-          data,
-        };
+        if (res.headersSent) return responseData;
+
+        return BaseResponseSchema.parse({
+          statusCode: res.StatusCode,
+          success: responseData.success,
+          data: responseData.data,
+          message: responseData.message,
+        });
       }),
     );
   }

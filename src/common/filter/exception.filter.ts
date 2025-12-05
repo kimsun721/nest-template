@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { ZodSerializationException, ZodValidationException } from 'nestjs-zod';
 import { Prisma } from 'src/generated/prisma/client';
 import z, { prettifyError, ZodError } from 'zod';
+import { BaseResponseSchema } from '../response';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
@@ -67,10 +68,13 @@ export class CustomExceptionFilter implements ExceptionFilter {
       error = res.error;
     }
 
-    response.status(status).json({
-      status,
-      message,
-      error,
-    });
+    response.status(status).json(
+      BaseResponseSchema.parse({
+        statusCode: status,
+        success: false,
+        data: error,
+        message,
+      }),
+    );
   }
 }

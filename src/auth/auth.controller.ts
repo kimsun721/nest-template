@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/generated/prisma/client';
+import { BaseResponse } from 'src/common/response';
 
 @Controller('auth')
 export class AuthController {
@@ -11,8 +11,8 @@ export class AuthController {
   ) {}
 
   @Get()
-  async get(): Promise<User[]> {
-    const users = this.prismaService.user.findMany();
-    return users;
+  async get() {
+    const users = await this.prismaService.user.findMany();
+    return BaseResponse.success(users, 'user found');
   }
 }

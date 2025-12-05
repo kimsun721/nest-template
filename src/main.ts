@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ZodValidationPipe } from 'nestjs-zod';
+import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { CustomExceptionFilter } from './common/filter/exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
