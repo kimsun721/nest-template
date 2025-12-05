@@ -17,7 +17,7 @@ export class TransformInterceptor implements NestInterceptor {
         if (res.headersSent) return responseData;
 
         return BaseResponseSchema.parse({
-          statusCode: res.StatusCode,
+          statusCode: res.statusCode,
           success: responseData.success,
           data: responseData.data,
           message: responseData.message,
