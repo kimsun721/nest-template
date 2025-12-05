@@ -1,7 +1,7 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
-import { DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CustomExceptionFilter } from './common/filter/exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 
@@ -20,10 +20,13 @@ async function bootstrap() {
   });
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('example')
-    .setDescription('example')
+    .setTitle('template')
+    .setDescription('template')
     .setVersion('0.1')
     .build();
+
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('swagger', app, swaggerDocument);
 
   await app.listen(process.env.SERVER_PORT ?? 3000);
 }
