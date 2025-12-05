@@ -2,8 +2,8 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { CustomExceptionFilter } from './common/filter/exception.filter';
-import { TransformInterceptor } from './common/interceptor/transform.interceptor';
+import { CustomExceptionFilter } from './common/filters/exception.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

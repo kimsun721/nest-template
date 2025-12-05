@@ -1,8 +1,8 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { ZodSerializationException, ZodValidationException } from 'nestjs-zod';
-import { Prisma } from 'src/generated/prisma/client';
+import { Prisma } from 'src/prisma/generated/prisma/client';
 import z, { prettifyError, ZodError } from 'zod';
-import { BaseResponseSchema } from '../response';
+import { BaseResponseSchema } from '../dto/base-response';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {

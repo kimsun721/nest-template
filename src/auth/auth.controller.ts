@@ -1,18 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { BaseResponse } from 'src/common/response';
+import { BaseResponse } from 'src/common/dto/base-response';
+import { ExampleDto } from './dto/example.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Get()
-  async get() {
-    const users = await this.prismaService.user.findMany();
-    return BaseResponse.success(users, 'user found');
+  @Get(':id')
+  async get(@Param() dto: ExampleDto) {
+    return BaseResponse.success(await this.authService.get(dto.id), 'users found');
   }
 }

@@ -6,7 +6,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { map } from 'rxjs';
-import { BaseResponseSchema } from '../response';
+import { BaseResponseSchema } from '../dto/base-response';
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
