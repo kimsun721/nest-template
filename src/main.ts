@@ -4,9 +4,12 @@ import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CustomExceptionFilter } from './common/filters/exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { HttpStatus } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.setGlobalPrefix('api');
   app.enableShutdownHooks();

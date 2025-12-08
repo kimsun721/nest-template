@@ -37,9 +37,9 @@ export class CustomExceptionFilter implements ExceptionFilter {
           break;
         case 'P2002': // duplicate key
           status = HttpStatus.CONFLICT;
-          console.log(exception);
-          const target = exception.meta?.target as string[];
-          message = `unique constraint failed on fileds : ${target[0] ?? []}`;
+          message = exception.message.match(
+            /Unique constraint failed on the fields: \((.+)\)/,
+          )?.[0];
           error = 'DuplicateKey';
           break;
         case 'P2003': // not found foreign key
@@ -49,7 +49,6 @@ export class CustomExceptionFilter implements ExceptionFilter {
           break;
         case 'P2025': // record not found
           const record = exception.meta?.modelName ?? 'Record';
-
           status = HttpStatus.NOT_FOUND;
           message = `${record} not found`;
           error = 'RecordNotFound';

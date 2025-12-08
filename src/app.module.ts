@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtStrategy } from './auth/strategy/jwt.strategy';
 import config from './common/config/config';
+import { RedisModule } from './auth/redis/redis.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import config from './common/config/config';
       envFilePath: process.env.NODE_ENV == 'production' ? undefined : '.env',
       load: [config],
     }),
+    RedisModule,
     PrismaModule,
     AuthModule,
   ],
