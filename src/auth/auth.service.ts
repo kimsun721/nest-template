@@ -10,6 +10,7 @@ import { RegisterDto } from './dto/request/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/request/login.dto';
 import { RedisService } from './redis/redis.service';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -26,31 +27,39 @@ export class AuthService {
     return;
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, res: Response): Promise<{ accessToken: string }> {
     const { email, password } = dto;
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { email },
+      select: { id: true, password: true, username: true },
+    });
 
-    const user = await this.prisma.user.findUniqueOrThrow({ where: { email } });
+    await this.comparePassword(password, user.password);
 
-    const result = await this.comparePassword(password, user.password);
-    if (!result) throw new BadRequestException('비밀번호가 일치하지 않습니다.');
-
-    const payload = {
-      userId: user.id,
-      email: user.email,
-      uesrname: user.username,
-    };
+    const payload = { userId: user.id, username: user.username };
     const accessToken = await this.jwtService.sign(payload, { expiresIn: '10m' });
-    const uuid = crypto.randomUUID();
-    const userId = user.id;
+    const newUuid = crypto.randomUUID();
 
-    const refreshToken = await this.redis.get(`refresh:${uuid}`);
-    if (refreshToken) {
-      await this.redis.expire(`refresh:${uuid}`, 604800);
-    } else {
-      await this.redis.setex(`refresh:${uuid}`, 604800, userId.toString());
+    const oldUuid = await this.redis.get(`user_refresh:${user.id}`);
+    if (oldUuid) {
+      await this.redis.del(`refresh:${oldUuid}`);
     }
 
-    return { accessToken, uuid };
+    const THIRTY_DAYS_IN_S = 30 * 24 * 60 * 60;
+
+    await Promise.all([
+      this.redis.setex(`refresh:${newUuid}`, THIRTY_DAYS_IN_S, user.id.toString()),
+      this.redis.setex(`user_refresh:${user.id}`, THIRTY_DAYS_IN_S, newUuid),
+    ]);
+
+    res.cookie('refreshToken', newUuid, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: THIRTY_DAYS_IN_S * 1000,
+    });
+
+    return { accessToken };
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -58,7 +67,8 @@ export class AuthService {
     return bcrypt.hash(password, salt);
   }
 
-  async comparePassword(password: string, encrypted: string): Promise<boolean> {
-    return await bcrypt.compare(password, encrypted);
+  async comparePassword(password: string, encrypted: string): Promise<void> {
+    const match = await bcrypt.compare(password, encrypted);
+    if (!match) throw new BadRequestException('비밀번호가 일치하지 않습니다.');
   }
 }

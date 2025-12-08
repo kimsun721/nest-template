@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { BaseResponse } from 'src/common/dto/base-response';
 import { ExampleDto } from './dto/example.dto';
 import { RegisterDto } from './dto/request/register.dto';
 import { LoginDto } from './dto/request/login.dto';
+import { response, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -16,8 +17,12 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() dto: LoginDto): Promise<BaseResponse> {
-    const result = await this.authService.login(dto);
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<BaseResponse> {
+    const result = await this.authService.login(dto, res);
     return BaseResponse.success(result, '로그인에 성공했습니다.');
   }
 }
