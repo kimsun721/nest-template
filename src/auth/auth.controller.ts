@@ -5,6 +5,7 @@ import { ExampleDto } from './dto/example.dto';
 import { RegisterDto } from './dto/request/register.dto';
 import { LoginDto } from './dto/request/login.dto';
 import { response, Response } from 'express';
+import { RefreshToken } from 'src/common/decorators/refresh.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -24,5 +25,11 @@ export class AuthController {
   ): Promise<BaseResponse> {
     const result = await this.authService.login(dto, res);
     return BaseResponse.success(result, '로그인에 성공했습니다.');
+  }
+
+  @Post('refresh')
+  async refresh(@RefreshToken() refreshToken: string) {
+    const result = await this.authService.refresh(refreshToken);
+    return BaseResponse.success(result, '액세스 토큰 재발급에 성공했습니다.');
   }
 }

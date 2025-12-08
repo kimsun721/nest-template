@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/request/login.dto';
 import { RedisService } from './redis/redis.service';
 import { Response } from 'express';
+import z from 'zod';
 
 @Injectable()
 export class AuthService {
@@ -58,6 +60,24 @@ export class AuthService {
       secure: process.env.NODE_ENV === 'production',
       maxAge: THIRTY_DAYS_IN_S * 1000,
     });
+
+    return { accessToken };
+  }
+
+  async refresh(refreshToken: string) {
+    const userId = await this.redis.get(`refresh:${refreshToken}`);
+    if (!userId) throw new UnauthorizedException('Invalid token');
+
+    const parsedUserId = z.coerce.number().parse(userId);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: parsedUserId },
+      select: { username: true },
+    });
+    if (!user) throw new UnauthorizedException('Invalid token');
+
+    const payload = { userId: parsedUserId, username: user.username };
+    const accessToken = await this.jwtService.sign(payload, { expiresIn: '10m' });
 
     return { accessToken };
   }
