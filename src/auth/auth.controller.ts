@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { BaseResponse } from 'src/common/dto/base-response';
 import { ExampleDto } from './dto/example.dto';
@@ -6,6 +16,8 @@ import { RegisterDto } from './dto/request/register.dto';
 import { LoginDto } from './dto/request/login.dto';
 import { response, Response } from 'express';
 import { RefreshToken } from 'src/common/decorators/refresh.decorator';
+import { UserId } from 'src/common/decorators/user-id.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -28,8 +40,17 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @HttpCode(HttpStatus.OK)
   async refresh(@RefreshToken() refreshToken: string) {
     const result = await this.authService.refresh(refreshToken);
     return BaseResponse.success(result, '액세스 토큰 재발급에 성공했습니다.');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@UserId() userId: number, @Res({ passthrough: true }) res: Response) {
+    const result = await this.authService.logout(userId, res);
+    return BaseResponse.success(result, '로그아웃에 성공했습니다.');
   }
 }

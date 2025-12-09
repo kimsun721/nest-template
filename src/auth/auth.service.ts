@@ -26,7 +26,6 @@ export class AuthService {
     const { username, email, password } = dto;
     const hashedPassword = await this.hashPassword(password);
     await this.prisma.user.create({ data: { email, username, password: hashedPassword } });
-    return;
   }
 
   async login(dto: LoginDto, res: Response): Promise<{ accessToken: string }> {
@@ -64,7 +63,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
     const userId = await this.redis.get(`refresh:${refreshToken}`);
     if (!userId) throw new UnauthorizedException('Invalid token');
 
@@ -82,6 +81,24 @@ export class AuthService {
     return { accessToken };
   }
 
+  async logout(userId: number, res: Response): Promise<void> {
+    const uuid = await this.redis.get(`user_refresh:${userId}`);
+    if (!uuid) return;
+
+    await Promise.all([
+      this.redis.del(`refresh:${uuid}`),
+      this.redis.del(`user_refresh:${userId}`),
+    ]);
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    return;
+  }
+
   async hashPassword(password: string): Promise<string> {
     const salt = await bcrypt.genSalt(12);
     return bcrypt.hash(password, salt);
@@ -90,5 +107,7 @@ export class AuthService {
   async comparePassword(password: string, encrypted: string): Promise<void> {
     const match = await bcrypt.compare(password, encrypted);
     if (!match) throw new BadRequestException('비밀번호가 일치하지 않습니다.');
+
+    return;
   }
 }
