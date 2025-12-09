@@ -6,7 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtStrategy } from './auth/strategy/jwt.strategy';
 import config from './common/config/config';
-import { RedisModule } from './auth/redis/redis.module';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
   imports: [

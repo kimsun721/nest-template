@@ -4,8 +4,8 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { RedisModule } from './redis/redis.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { RedisModule } from 'src/common/redis/redis.module';
 
 @Module({
   imports: [

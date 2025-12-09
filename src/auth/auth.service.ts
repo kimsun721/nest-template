@@ -10,9 +10,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/request/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/request/login.dto';
-import { RedisService } from './redis/redis.service';
 import { Response } from 'express';
 import z from 'zod';
+import { RedisService } from 'src/common/redis/redis.service';
 
 @Injectable()
 export class AuthService {
