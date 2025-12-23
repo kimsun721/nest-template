@@ -49,7 +49,6 @@ export class CustomExceptionFilter implements ExceptionFilter {
           break;
         case 'P2025': // record not found
           const record = exception.meta?.modelName ?? 'Record';
-
           status = HttpStatus.NOT_FOUND;
           message = `${record} not found`;
           error = 'RecordNotFound';
