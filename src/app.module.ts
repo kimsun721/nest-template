@@ -13,6 +13,7 @@ import config from './common/config/config';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV == 'production' ? undefined : '.env',
       load: [config],
+      expandVariables: true
     }),
     PrismaModule,
     AuthModule,

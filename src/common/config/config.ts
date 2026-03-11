@@ -1,5 +1,7 @@
 export default () => ({
-  SERVER_PORT: process.env.SERVER_PORT,
+  SERVER_PORT: process.env.SERVER_PORT || 3000,
+  FRONT_URL: process.env.FRONT_URL || '*',
   DATABASE_URL: process.env.DATABASE_URL,
-  FRONT_URL: process.env.FRONT_URL,
+  JWT_SECRET: process.env.JWT_SECRET,
+  NODE_ENV: process.env.NODE_ENV || 'development',
 });
