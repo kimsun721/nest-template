@@ -14,6 +14,7 @@ import { RedisModule } from './common/redis/redis.module';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV == 'production' ? undefined : '.env',
       load: [config],
+      expandVariables:true
     }),
     RedisModule,
     PrismaModule,
